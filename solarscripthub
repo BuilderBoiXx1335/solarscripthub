@@ -1,0 +1,63 @@
+-- 🌸 SolarScriptHub 🌸
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Create GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "SolarScriptHub"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 250, 0, 160)
+frame.Position = UDim2.new(0.5, -125, 0.5, -80)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Visible = false
+frame.Parent = gui
+
+-- Toggle GUI with RightShift
+local UIS = game:GetService("UserInputService")
+UIS.InputBegan:Connect(function(input, gpe)
+    if not gpe and input.KeyCode == Enum.KeyCode.RightShift then
+        frame.Visible = not frame.Visible
+    end
+end)
+
+-- Button Creator
+local function createButton(text, yPos, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 220, 0, 30)
+    btn.Position = UDim2.new(0, 15, 0, yPos)
+    btn.Text = text
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.BorderSizePixel = 0
+    btn.Parent = frame
+    btn.MouseButton1Click:Connect(callback)
+end
+
+-- WalkSpeed 100
+createButton("WalkSpeed: 100", 20, function()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if hum then hum.WalkSpeed = 100 end
+end)
+
+-- Reset Speed
+createButton("Reset Speed", 60, function()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if hum then hum.WalkSpeed = 16 end
+end)
+
+-- Infinite Jump
+createButton("Infinite Jump", 100, function()
+    game:GetService("UserInputService").JumpRequest:Connect(function()
+        local char = player.Character or player.CharacterAdded:Wait()
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then hum:ChangeState("Jumping") end
+    end)
+end)
