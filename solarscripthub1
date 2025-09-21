@@ -6,114 +6,294 @@ gui.Parent = player:WaitForChild("PlayerGui")
 
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 280, 0, 40) -- collapsed
-frame.Position = UDim2.new(0.5, -140, 0.5, -110)
+frame.Size = UDim2.new(0, 340, 0, 400)
+frame.Position = UDim2.new(0.5, -170, 0.5, -200)
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
 frame.Visible = true
 frame.Parent = gui
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
 
--- Title Bar (Dropdown Button)
-local dropdownBtn = Instance.new("TextButton")
-dropdownBtn.Size = UDim2.new(1, -30, 0, 40)
-dropdownBtn.Position = UDim2.new(0, 0, 0, 0)
-dropdownBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-dropdownBtn.Text = "🌸 SolarScriptHub"
-dropdownBtn.TextColor3 = Color3.new(1, 1, 1)
-dropdownBtn.Font = Enum.Font.GothamBold
-dropdownBtn.TextSize = 18
-dropdownBtn.BorderSizePixel = 0
-dropdownBtn.Parent = frame
+-- Header
+local header = Instance.new("Frame", frame)
+header.Size = UDim2.new(1, 0, 0, 40)
+header.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+header.BorderSizePixel = 0
 
--- Close Button
-local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 30, 0, 40)
+local title = Instance.new("TextLabel", header)
+title.Size = UDim2.new(1, -60, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.Text = "🌸 SolarScriptHub"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.BackgroundTransparency = 1
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Collapse + Close
+local collapseBtn = Instance.new("TextButton", header)
+collapseBtn.Size = UDim2.new(0, 30, 1, 0)
+collapseBtn.Position = UDim2.new(1, -60, 0, 0)
+collapseBtn.Text = "-"
+collapseBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+collapseBtn.TextColor3 = Color3.new(1, 1, 1)
+collapseBtn.Font = Enum.Font.GothamBold
+collapseBtn.BorderSizePixel = 0
+
+local closeBtn = Instance.new("TextButton", header)
+closeBtn.Size = UDim2.new(0, 30, 1, 0)
 closeBtn.Position = UDim2.new(1, -30, 0, 0)
 closeBtn.Text = "X"
 closeBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
 closeBtn.TextColor3 = Color3.new(1, 1, 1)
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.BorderSizePixel = 0
-closeBtn.Parent = frame
 closeBtn.MouseButton1Click:Connect(function()
     frame.Visible = false
 end)
 
--- Toggle GUI with RightShift
-local UIS = game:GetService("UserInputService")
-UIS.InputBegan:Connect(function(input, gpe)
-    if not gpe and input.KeyCode == Enum.KeyCode.RightShift then
-        frame.Visible = not frame.Visible
-    end
-end)
+-- Scrollable Content
+local scroll = Instance.new("ScrollingFrame", frame)
+scroll.Position = UDim2.new(0, 0, 0, 40)
+scroll.Size = UDim2.new(1, 0, 1, -40)
+scroll.CanvasSize = UDim2.new(0, 0, 0, 1000)
+scroll.ScrollBarThickness = 6
+scroll.BackgroundTransparency = 1
+scroll.BorderSizePixel = 0
+scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scroll.CanvasPosition = Vector2.new(0, 0)
 
--- Dropdown Toggle
-local expanded = false
-dropdownBtn.MouseButton1Click:Connect(function()
-    expanded = not expanded
+local layout = Instance.new("UIListLayout", scroll)
+layout.Padding = UDim.new(0, 8)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- Collapse Logic
+local collapsed = false
+collapseBtn.MouseButton1Click:Connect(function()
+    collapsed = not collapsed
     frame:TweenSize(
-        expanded and UDim2.new(0, 280, 0, 280) or UDim2.new(0, 280, 0, 40),
+        collapsed and UDim2.new(0, 340, 0, 40) or UDim2.new(0, 340, 0, 400),
         "Out", "Quad", 0.3
     )
+    scroll.Visible = not collapsed
 end)
 
 -- Button Creator
-local function createButton(text, yPos, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 240, 0, 30)
-    btn.Position = UDim2.new(0, 20, 0, yPos)
+local function createButton(text, callback)
+    local btn = Instance.new("TextButton", scroll)
+    btn.Size = UDim2.new(1, -20, 0, 30)
     btn.Text = text
-    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
     btn.TextColor3 = Color3.new(1, 1, 1)
     btn.Font = Enum.Font.GothamBold
     btn.BorderSizePixel = 0
-    btn.Visible = true
-    btn.Parent = frame
+    btn.AutoButtonColor = true
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
     btn.MouseButton1Click:Connect(callback)
 end
 
--- Scripts
-createButton("WalkSpeed: 100", 50, function()
+-- Input Creator
+local function createInput(placeholder)
+    local box = Instance.new("TextBox", scroll)
+    box.Size = UDim2.new(1, -20, 0, 30)
+    box.PlaceholderText = placeholder
+    box.Text = ""
+    box.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    box.TextColor3 = Color3.new(1, 1, 1)
+    box.Font = Enum.Font.Gotham
+    box.BorderSizePixel = 0
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
+    return box
+end
+
+-- WalkSpeed
+local speedBox = createInput("Enter WalkSpeed (e.g. 50)")
+createButton("Set WalkSpeed", function()
     local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-    if hum then hum.WalkSpeed = 100 end
+    local val = tonumber(speedBox.Text)
+    if hum and val then hum.WalkSpeed = val end
 end)
 
-createButton("Reset Speed", 90, function()
-    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-    if hum then hum.WalkSpeed = 16 end
-end)
-
-createButton("Infinite Jump", 130, function()
-    game:GetService("UserInputService").JumpRequest:Connect(function()
-        local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-        if hum then hum:ChangeState("Jumping") end
-    end)
-end)
-
-createButton("Flip Forward", 170, function()
+-- Flip
+local flipBox = createInput("Enter Flip Distance (e.g. 100)")
+createButton("Flip Forward (ragdoll)", function()
     local char = player.Character
     local hum = char and char:FindFirstChildOfClass("Humanoid")
     local root = char and char:FindFirstChild("HumanoidRootPart")
-    if not hum or not root then return end
+    local val = tonumber(flipBox.Text)
+    if not hum or not root or not val then return end
 
-    -- Play starter animation
-    local anim = Instance.new("Animation")
-    anim.AnimationId = "rbxassetid://180426354" -- Replace with your own later
-    local track = hum:LoadAnimation(anim)
-    track:Play()
-
-    -- Fling forward
+    hum:ChangeState(Enum.HumanoidStateType.Physics)
     local direction = root.CFrame.LookVector
     local fling = Instance.new("BodyVelocity")
-    fling.Velocity = direction * 100 + Vector3.new(0, 50, 0)
+    fling.Velocity = direction * val
     fling.MaxForce = Vector3.new(1e5, 1e5, 1e5)
     fling.P = 10000
     fling.Parent = root
     wait(0.5)
     fling:Destroy()
+    hum:ChangeState(Enum.HumanoidStateType.GettingUp)
 end)
 
-createButton("Play Animation (placeholder)", 210, function()
-    print("Animation system coming soon 🌸")
+-- ESP
+createButton("Toggle ESP (Team Colors)", function()
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local tag = "SolarESP"
+            if not plr.Character:FindFirstChild(tag) then
+                local esp = Instance.new("Highlight")
+                esp.Name = tag
+                esp.Adornee = plr.Character
+                esp.FillTransparency = 0.5
+                esp.OutlineTransparency = 0
+                esp.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                esp.FillColor = plr.Team and plr.Team.TeamColor.Color or Color3.new(1, 1, 1)
+                esp.OutlineColor = Color3.new(1, 1, 1)
+                esp.Parent = plr.Character
+            else
+                plr.Character[tag]:Destroy()
+            end
+        end
+    end
+end)
+
+-- Spin
+local spinning = false
+createButton("Toggle Spin", function()
+    spinning = not spinning
+    spawn(function()
+        while spinning do
+            local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if root then
+                root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(10), 0)
+            end
+            wait(0.05)
+        end
+    end)
+end)
+
+-- Sit/Stand
+local sitting = false
+createButton("Toggle Sit/Stand", function()
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        sitting = not sitting
+        hum.Sit = sitting
+    end
+end)
+
+-- Teleport to Player
+local tpBox = createInput("Enter player name to teleport to")
+createButton("Teleport to Player", function()
+    local target = game.Players:FindFirstChild(tpBox.Text)
+    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and root then
+        root.CFrame = target.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+    end
+end)
+
+-- Freeze / Unfreeze
+createButton("Freeze Self", function()
+    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if root then
+	        root.Anchored = true
+    end
+end)
+
+createButton("Unfreeze Self", function()
+    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if root then root.Anchored = false end
+end)
+
+-- Play Animation
+local animBox = createInput("Enter Animation ID")
+createButton("Play Animation", function()
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    local id = tonumber(animBox.Text)
+    if hum and id then
+        local anim = Instance.new("Animation")
+        anim.AnimationId = "rbxassetid://" .. id
+        local track = hum:LoadAnimation(anim)
+        track:Play()
+    end
+end)
+
+-- Reset Character (fixed)
+createButton("Reset Character", function()
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.Health = 0 end
+end)
+
+-- Toggle Fly
+local flying = false
+local flyBV, flyBG
+
+createButton("Toggle Fly", function()
+    local char = player.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    flying = not flying
+
+    if flying then
+        flyBV = Instance.new("BodyVelocity")
+        flyBV.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+        flyBV.Velocity = Vector3.new(0, 0, 0)
+        flyBV.Parent = root
+
+        flyBG = Instance.new("BodyGyro")
+        flyBG.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+        flyBG.CFrame = root.CFrame
+        flyBG.Parent = root
+
+        game:GetService("RunService").Heartbeat:Connect(function()
+            if flying and root and flyBV and flyBG then
+                local move = Vector3.zero
+                local input = game:GetService("UserInputService")
+                if input:IsKeyDown(Enum.KeyCode.W) then move += workspace.CurrentCamera.CFrame.LookVector end
+                if input:IsKeyDown(Enum.KeyCode.S) then move -= workspace.CurrentCamera.CFrame.LookVector end
+                if input:IsKeyDown(Enum.KeyCode.A) then move -= workspace.CurrentCamera.CFrame.RightVector end
+                if input:IsKeyDown(Enum.KeyCode.D) then move += workspace.CurrentCamera.CFrame.RightVector end
+                flyBV.Velocity = move.Unit * 50
+                flyBG.CFrame = workspace.CurrentCamera.CFrame
+            end
+        end)
+    else
+        if flyBV then flyBV:Destroy() end
+        if flyBG then flyBG:Destroy() end
+    end
+end)
+
+-- Toggle NoClip
+local noclip = false
+createButton("Toggle NoClip", function()
+    noclip = not noclip
+    game:GetService("RunService").Stepped:Connect(function()
+        if noclip and player.Character then
+            for _, part in pairs(player.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end)
+end)
+
+-- Toggle Teleport to Mouse
+local autoTP = false
+createButton("Toggle Teleport to Mouse", function()
+    autoTP = not autoTP
+    local mouse = player:GetMouse()
+    spawn(function()
+        while autoTP do
+            local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if root and mouse then
+                root.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0))
+            end
+            wait(0.2)
+        end
+    end)
 end)
 
