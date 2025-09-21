@@ -1,21 +1,44 @@
--- 🌸 SolarScriptHub 🌸
 local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-
--- Create GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "SolarScriptHub"
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
+-- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 250, 0, 160)
-frame.Position = UDim2.new(0.5, -125, 0.5, -80)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Size = UDim2.new(0, 280, 0, 220)
+frame.Position = UDim2.new(0.5, -140, 0.5, -110)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
-frame.Visible = false
+frame.Active = true
+frame.Draggable = true
+frame.Visible = true
 frame.Parent = gui
+
+-- Title Bar
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+title.Text = "🌸 SolarScriptHub"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.BorderSizePixel = 0
+title.Parent = frame
+
+-- Close Button
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -30, 0, 0)
+closeBtn.Text = "X"
+closeBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.BorderSizePixel = 0
+closeBtn.Parent = frame
+closeBtn.MouseButton1Click:Connect(function()
+    frame.Visible = false
+end)
 
 -- Toggle GUI with RightShift
 local UIS = game:GetService("UserInputService")
@@ -28,36 +51,43 @@ end)
 -- Button Creator
 local function createButton(text, yPos, callback)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 220, 0, 30)
-    btn.Position = UDim2.new(0, 15, 0, yPos)
+    btn.Size = UDim2.new(0, 240, 0, 30)
+    btn.Position = UDim2.new(0, 20, 0, yPos)
     btn.Text = text
-    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.TextColor3 = Color3.new(1, 1, 1)
     btn.Font = Enum.Font.GothamBold
     btn.BorderSizePixel = 0
     btn.Parent = frame
     btn.MouseButton1Click:Connect(callback)
 end
 
--- WalkSpeed 100
-createButton("WalkSpeed: 100", 20, function()
-    local char = player.Character or player.CharacterAdded:Wait()
-    local hum = char:FindFirstChildOfClass("Humanoid")
+-- Scripts
+createButton("WalkSpeed: 100", 40, function()
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
     if hum then hum.WalkSpeed = 100 end
 end)
 
--- Reset Speed
-createButton("Reset Speed", 60, function()
-    local char = player.Character or player.CharacterAdded:Wait()
-    local hum = char:FindFirstChildOfClass("Humanoid")
+createButton("Reset Speed", 80, function()
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
     if hum then hum.WalkSpeed = 16 end
 end)
 
--- Infinite Jump
-createButton("Infinite Jump", 100, function()
+createButton("Infinite Jump", 120, function()
     game:GetService("UserInputService").JumpRequest:Connect(function()
-        local char = player.Character or player.CharacterAdded:Wait()
-        local hum = char:FindFirstChildOfClass("Humanoid")
+        local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
         if hum then hum:ChangeState("Jumping") end
     end)
 end)
+
+createButton("Teleport to Random Player", 160, function()
+    local players = game.Players:GetPlayers()
+    local target = players[math.random(1, #players)]
+    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = target.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
+        end
+    end
+end)
+
