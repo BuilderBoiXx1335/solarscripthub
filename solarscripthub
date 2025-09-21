@@ -6,7 +6,7 @@ gui.Parent = player:WaitForChild("PlayerGui")
 
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 280, 0, 220)
+frame.Size = UDim2.new(0, 280, 0, 40) -- collapsed height
 frame.Position = UDim2.new(0.5, -140, 0.5, -110)
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
@@ -17,7 +17,8 @@ frame.Parent = gui
 
 -- Title Bar
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 30)
+title.Size = UDim2.new(1, -30, 0, 40)
+title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 title.Text = "🌸 SolarScriptHub"
 title.TextColor3 = Color3.new(1, 1, 1)
@@ -28,7 +29,7 @@ title.Parent = frame
 
 -- Close Button
 local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Size = UDim2.new(0, 30, 0, 40)
 closeBtn.Position = UDim2.new(1, -30, 0, 0)
 closeBtn.Text = "X"
 closeBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
@@ -48,6 +49,16 @@ UIS.InputBegan:Connect(function(input, gpe)
     end
 end)
 
+-- Dropdown Toggle
+local expanded = false
+title.MouseButton1Click:Connect(function()
+    expanded = not expanded
+    frame:TweenSize(
+        expanded and UDim2.new(0, 280, 0, 260) or UDim2.new(0, 280, 0, 40),
+        "Out", "Quad", 0.3
+    )
+end)
+
 -- Button Creator
 local function createButton(text, yPos, callback)
     local btn = Instance.new("TextButton")
@@ -58,36 +69,38 @@ local function createButton(text, yPos, callback)
     btn.TextColor3 = Color3.new(1, 1, 1)
     btn.Font = Enum.Font.GothamBold
     btn.BorderSizePixel = 0
+    btn.Visible = true
     btn.Parent = frame
     btn.MouseButton1Click:Connect(callback)
 end
 
 -- Scripts
-createButton("WalkSpeed: 100", 40, function()
+createButton("WalkSpeed: 100", 50, function()
     local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
     if hum then hum.WalkSpeed = 100 end
 end)
 
-createButton("Reset Speed", 80, function()
+createButton("Reset Speed", 90, function()
     local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
     if hum then hum.WalkSpeed = 16 end
 end)
 
-createButton("Infinite Jump", 120, function()
+createButton("Infinite Jump", 130, function()
     game:GetService("UserInputService").JumpRequest:Connect(function()
         local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
         if hum then hum:ChangeState("Jumping") end
     end)
 end)
 
-createButton("Teleport to Random Player", 160, function()
-    local players = game.Players:GetPlayers()
-    local target = players[math.random(1, #players)]
-    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            hrp.CFrame = target.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
-        end
+createButton("Flip Character", 170, function()
+    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if root then
+        root.CFrame = root.CFrame * CFrame.Angles(math.rad(180), 0, 0)
     end
+end)
+
+createButton("JumpPower: 150", 210, function()
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.JumpPower = 150 end
 end)
 
