@@ -6,7 +6,7 @@ gui.Parent = player:WaitForChild("PlayerGui")
 
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 280, 0, 40) -- collapsed height
+frame.Size = UDim2.new(0, 280, 0, 40) -- collapsed
 frame.Position = UDim2.new(0.5, -140, 0.5, -110)
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
@@ -16,11 +16,11 @@ frame.Visible = true
 frame.Parent = gui
 
 -- Title Bar
-local title = Instance.new("TextLabel")
+local title = Instance.new("TextButton")
 title.Size = UDim2.new(1, -30, 0, 40)
 title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-title.Text = "d SolarScriptHub"
+title.Text = "🌸 SolarScriptHub"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
@@ -54,7 +54,7 @@ local expanded = false
 title.MouseButton1Click:Connect(function()
     expanded = not expanded
     frame:TweenSize(
-        expanded and UDim2.new(0, 280, 0, 260) or UDim2.new(0, 280, 0, 40),
+        expanded and UDim2.new(0, 280, 0, 320) or UDim2.new(0, 280, 0, 40),
         "Out", "Quad", 0.3
     )
 end)
@@ -99,8 +99,39 @@ createButton("Flip Character", 170, function()
     end
 end)
 
-createButton("JumpPower: 150", 210, function()
+createButton("Fly (toggle)", 210, function()
+    local flying = false
     local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-    if hum then hum.JumpPower = 150 end
+    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not hum or not root then return end
+
+    local bv = Instance.new("BodyVelocity")
+    bv.Velocity = Vector3.zero
+    bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+    bv.Parent = root
+
+    UIS.InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.F then
+            flying = not flying
+            bv.Velocity = flying and Vector3.new(0, 50, 0) or Vector3.zero
+        end
+    end)
+end)
+
+createButton("Fling", 250, function()
+    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if root then
+        local fling = Instance.new("BodyAngularVelocity")
+        fling.AngularVelocity = Vector3.new(0, 9999, 0)
+        fling.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+        fling.P = 10000
+        fling.Parent = root
+        wait(1)
+        fling:Destroy()
+    end
+end)
+
+createButton("Play Animation (placeholder)", 290, function()
+    print("Animation system coming soon 🌸")
 end)
 
